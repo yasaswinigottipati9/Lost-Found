@@ -1,0 +1,233 @@
+{% extends 'lostfound/base.html' %}
+{% load static %}
+
+{% block title %}Chat with {{ receiver.username }} - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row g-4" style="height: 80vh;">
+
+        <!-- Left Sidebar: Conversations List -->
+        <div class="col-md-3 d-none d-md-block">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-chat-dots-fill me-2"></i>Conversations</h6>
+                </div>
+                <div class="card-body p-0 overflow-auto">
+                    {% if conversations %}
+                    {% for conv_user in conversations %}
+                    <a href="{% url 'chat' conv_user.pk %}"
+                       class="d-flex align-items-center p-3 text-decoration-none border-bottom conversation-item {% if conv_user == receiver %}bg-primary bg-opacity-10{% endif %}">
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                             style="width:42px;height:42px;font-size:1.1rem;">
+                            {{ conv_user.username|first|upper }}
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="fw-bold small text-dark">
+                                {{ conv_user.get_full_name|default:conv_user.username }}
+                            </div>
+                            <div class="text-muted" style="font-size:0.75rem;">@{{ conv_user.username }}</div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center p-4">
+                        <i class="bi bi-chat-square-dots fs-2 text-muted"></i>
+                        <p class="text-muted small mt-2">No conversations yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Chat Window -->
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm h-100 d-flex flex-column">
+
+                <!-- Chat Header -->
+                <div class="card-header bg-white border-bottom p-3">
+                    <div class="d-flex align-items-center">
+                        <a href="{% if item %}{% url 'item_detail' item.pk %}{% else %}{% url 'dashboard' %}{% endif %}"
+                           class="btn btn-sm btn-outline-secondary me-3">
+                            <i class="bi bi-arrow-left"></i>
+                        </a>
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
+                             style="width:46px;height:46px;font-size:1.2rem;">
+                            {{ receiver.username|first|upper }}
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">{{ receiver.get_full_name|default:receiver.username }}</h6>
+                            <small class="text-muted">@{{ receiver.username }}</small>
+                        </div>
+                        {% if item %}
+                        <div class="ms-auto">
+                            <a href="{% url 'item_detail' item.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-box-seam me-1"></i>
+                                {{ item.title|truncatechars:20 }}
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Item Context Banner -->
+                    {% if item %}
+                    <div class="mt-2 p-2 bg-light rounded-3 d-flex align-items-center gap-2">
+                        {% if item.item_type == 'lost' %}
+                            <span class="badge bg-danger">LOST</span>
+                        {% else %}
+                            <span class="badge bg-success">FOUND</span>
+                        {% endif %}
+                        <span class="small fw-bold">{{ item.title }}</span>
+                        <span class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ item.location }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Messages Area -->
+                <div class="card-body overflow-auto flex-grow-1 p-3" id="chatMessages"
+                     style="background: #f8f9fa;">
+
+                    {% if messages_list %}
+                    {% for msg in messages_list %}
+
+                    <!-- Date separator -->
+                    {% if forloop.first %}
+                    <div class="text-center mb-3">
+                        <span class="badge bg-secondary bg-opacity-50 text-dark">
+                            {{ msg.timestamp|date:"d M Y" }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Message Bubble -->
+                    <div class="d-flex {% if msg.sender == user %}justify-content-end{% else %}justify-content-start{% endif %} mb-3">
+
+                        {% if msg.sender != user %}
+                        <!-- Receiver avatar -->
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2 flex-shrink-0"
+                             style="width:36px;height:36px;font-size:0.9rem;align-self:flex-end;">
+                            {{ msg.sender.username|first|upper }}
+                        </div>
+                        {% endif %}
+
+                        <div class="{% if msg.sender == user %}chat-bubble-sent{% else %}chat-bubble-received{% endif %}"
+                             style="max-width: 70%;">
+                            <div class="{% if msg.sender == user %}bg-primary text-white{% else %}bg-white{% endif %} rounded-3 px-3 py-2 shadow-sm">
+                                {{ msg.message }}
+                            </div>
+                            <div class="{% if msg.sender == user %}text-end{% endif %} mt-1">
+                                <small class="text-muted" style="font-size:0.7rem;">
+                                    {{ msg.timestamp|date:"g:i A" }}
+                                    {% if msg.sender == user %}
+                                        {% if msg.is_read %}
+                                            <i class="bi bi-check2-all text-primary ms-1"></i>
+                                        {% else %}
+                                            <i class="bi bi-check2 ms-1"></i>
+                                        {% endif %}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+
+                        {% if msg.sender == user %}
+                        <!-- Sender avatar -->
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center ms-2 flex-shrink-0"
+                             style="width:36px;height:36px;font-size:0.9rem;align-self:flex-end;">
+                            {{ user.username|first|upper }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <!-- No messages yet -->
+                    <div class="text-center py-5">
+                        <i class="bi bi-chat-square-dots fs-1 text-muted mb-3 d-block"></i>
+                        <h6 class="text-muted">Start the conversation!</h6>
+                        <p class="text-muted small">
+                            {% if item %}
+                                Ask about "{{ item.title }}" to verify and arrange pickup.
+                            {% else %}
+                                Send a message to {{ receiver.get_full_name|default:receiver.username }}.
+                            {% endif %}
+                        </p>
+                        <!-- Quick message suggestions -->
+                        <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm quick-msg"
+                                    data-msg="Hi! Is this item still available?">
+                                Hi! Is this still available?
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm quick-msg"
+                                    data-msg="I think I found/lost this item. Can we verify details?">
+                                I think this is my item!
+                            </button>
+                            {% if item %}
+                            <button class="btn btn-outline-primary btn-sm quick-msg"
+                                    data-msg="Can you please describe the item in more detail?">
+                                Can you describe it more?
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Message Input Area -->
+                <div class="card-footer bg-white border-top p-3">
+                    <form method="POST" id="messageForm">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 align-items-end">
+                            <div class="flex-grow-1">
+                                {{ form.message }}
+                            </div>
+                            <button type="submit" class="btn btn-primary px-4" id="sendBtn">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </div>
+                        <!-- Chat tips -->
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check text-success me-1"></i>
+                                For safety, verify ownership with IMEI/ID before meeting. Meet in public places.
+                            </small>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto scroll to bottom of chat
+function scrollToBottom() {
+    const chatDiv = document.getElementById('chatMessages');
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+}
+scrollToBottom();
+
+// Quick message buttons
+document.querySelectorAll('.quick-msg').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('id_message').value = this.dataset.msg;
+        document.getElementById('id_message').focus();
+    });
+});
+
+// Ctrl+Enter to send
+document.getElementById('id_message').addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+        document.getElementById('messageForm').submit();
+    }
+});
+
+// Auto-refresh chat every 10 seconds (simple polling)
+// Student Note: In production, use WebSockets (Django Channels) for real-time chat
+setTimeout(function() {
+    location.reload();
+}, 15000);
+</script>
+{% endblock %}

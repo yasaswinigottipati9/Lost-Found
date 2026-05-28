@@ -1,0 +1,196 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "email": "admin@lostandfound.com",
+      "first_name": "Admin",
+      "last_name": "User",
+      "is_staff": true,
+      "is_superuser": true,
+      "is_active": true,
+      "password": "pbkdf2_sha256$600000$test$hashedpassword="
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "rahul_k",
+      "email": "rahul@example.com",
+      "first_name": "Rahul",
+      "last_name": "Kumar",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "password": "pbkdf2_sha256$600000$test$hashedpassword="
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "priya_s",
+      "email": "priya@example.com",
+      "first_name": "Priya",
+      "last_name": "Sharma",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "password": "pbkdf2_sha256$600000$test$hashedpassword="
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "title": "iPhone 13 Pro Max Blue",
+      "category": "electronics",
+      "description": "Lost my iPhone 13 Pro Max in Sierra Blue color near the bus stop. Has a black leather case with a small scratch on the back. IMEI: 352099001761481. Screen lock is enabled.",
+      "item_type": "lost",
+      "location": "MG Road Bus Stop, Bengaluru",
+      "location_detail": "Near the coffee shop on the left side of the bus stop",
+      "date_reported": "2024-01-15",
+      "status": "pending",
+      "contact_phone": "9876543210",
+      "contact_email": "rahul@example.com",
+      "is_approved": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 2,
+    "fields": {
+      "user": 3,
+      "title": "Blue Smartphone Found",
+      "category": "electronics",
+      "description": "Found a blue colored smartphone near MG Road. It has a black leather case. The phone is locked. Kept safely, please contact to claim with proof.",
+      "item_type": "found",
+      "location": "MG Road, Bengaluru",
+      "location_detail": "Found near the bus stop area",
+      "date_reported": "2024-01-15",
+      "status": "pending",
+      "contact_phone": "9123456780",
+      "contact_email": "priya@example.com",
+      "is_approved": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 3,
+    "fields": {
+      "user": 2,
+      "title": "Aadhaar Card & PAN Card",
+      "category": "documents",
+      "description": "Lost my Aadhaar Card and PAN Card in a brown leather wallet. The wallet also had a driving license and two debit cards. Lost near the railway station.",
+      "item_type": "lost",
+      "location": "Bengaluru City Railway Station",
+      "location_detail": "Platform 3 or the ticket counter area",
+      "date_reported": "2024-01-12",
+      "status": "pending",
+      "contact_phone": "9876543210",
+      "contact_email": "",
+      "is_approved": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 4,
+    "fields": {
+      "user": 3,
+      "title": "Brown Leather Wallet with Documents",
+      "category": "documents",
+      "description": "Found a brown leather wallet near the railway station. Contains some ID cards and bank cards. Please contact with details to claim.",
+      "item_type": "found",
+      "location": "KSR Bengaluru City Railway Station",
+      "location_detail": "Found near the main entrance",
+      "date_reported": "2024-01-12",
+      "status": "matched",
+      "contact_phone": "9123456780",
+      "contact_email": "priya@example.com",
+      "is_approved": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 5,
+    "fields": {
+      "user": 2,
+      "title": "Honda Activa Keys",
+      "category": "keys",
+      "description": "Lost Honda Activa keys with a small keychain of Ganesha idol. The key has Honda logo engraved. Lost somewhere in the market area.",
+      "item_type": "lost",
+      "location": "Commercial Street Market, Bengaluru",
+      "location_detail": "",
+      "date_reported": "2024-01-18",
+      "status": "pending",
+      "contact_phone": "9876543210",
+      "contact_email": "",
+      "is_approved": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 6,
+    "fields": {
+      "user": 3,
+      "title": "Gold Chain Necklace",
+      "category": "jewelry",
+      "description": "Found a gold chain necklace with a small locket near the park. The locket has a photo inside. Please contact to claim with description.",
+      "item_type": "found",
+      "location": "Cubbon Park, Bengaluru",
+      "location_detail": "Near the children's play area",
+      "date_reported": "2024-01-19",
+      "status": "pending",
+      "contact_phone": "9123456780",
+      "contact_email": "priya@example.com",
+      "is_approved": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 7,
+    "fields": {
+      "user": 2,
+      "title": "Dell Laptop Bag with Laptop",
+      "category": "electronics",
+      "description": "Lost my Dell Inspiron 15 laptop in a black Dell laptop bag. The laptop has stickers on the back and a small crack on the bottom right corner. Has important project files.",
+      "item_type": "lost",
+      "location": "BMTC Bus Route 335E",
+      "location_detail": "Left in bus, last seen near Majestic Bus Stand",
+      "date_reported": "2024-01-20",
+      "status": "pending",
+      "contact_phone": "9876543210",
+      "contact_email": "rahul@example.com",
+      "is_approved": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "lostfound.item",
+    "pk": 8,
+    "fields": {
+      "user": 3,
+      "title": "Returned: PAN Card to Owner",
+      "category": "documents",
+      "description": "PAN Card was found and returned to the rightful owner after verification. Owner provided correct details and the card was handed over safely.",
+      "item_type": "found",
+      "location": "Indiranagar, Bengaluru",
+      "location_detail": "",
+      "date_reported": "2024-01-10",
+      "status": "delivered",
+      "contact_phone": "",
+      "contact_email": "",
+      "is_approved": true,
+      "is_active": true
+    }
+  }
+]

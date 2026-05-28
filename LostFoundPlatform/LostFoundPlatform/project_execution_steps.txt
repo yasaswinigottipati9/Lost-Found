@@ -1,0 +1,13 @@
+
+
+create database lostandfound_db;
+
+py manage.py makemigrations lostfound
+
+py manage.py migrate
+
+py manage.py createsuperuser
+    admin
+    admin
+
+py manage.py runserver

@@ -1,0 +1,98 @@
+<!-- Item Card Component - Used on Home and Dashboard pages -->
+{% load static %}
+
+<div class="card item-card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+    <!-- Item Image -->
+    <div class="card-img-wrapper position-relative" style="height: 200px; overflow: hidden;">
+        {% if item.image %}
+            <img src="{{ item.image.url }}" class="card-img-top w-100 h-100" style="object-fit: cover;" alt="{{ item.title }}">
+        {% else %}
+            <!-- Default placeholder image based on category -->
+            <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                {% if item.category == 'electronics' %}
+                    <i class="bi bi-phone fs-1 text-muted"></i>
+                {% elif item.category == 'documents' %}
+                    <i class="bi bi-file-earmark-text fs-1 text-muted"></i>
+                {% elif item.category == 'vehicles' %}
+                    <i class="bi bi-bicycle fs-1 text-muted"></i>
+                {% elif item.category == 'keys' %}
+                    <i class="bi bi-key fs-1 text-muted"></i>
+                {% elif item.category == 'jewelry' %}
+                    <i class="bi bi-gem fs-1 text-muted"></i>
+                {% else %}
+                    <i class="bi bi-box-seam fs-1 text-muted"></i>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <!-- Type Badge (Lost/Found) overlaid on image -->
+        <div class="position-absolute top-0 start-0 m-2">
+            {% if item.item_type == 'lost' %}
+                <span class="badge bg-danger fs-6 px-2 py-1">
+                    <i class="bi bi-exclamation-triangle me-1"></i>LOST
+                </span>
+            {% else %}
+                <span class="badge bg-success fs-6 px-2 py-1">
+                    <i class="bi bi-hand-thumbs-up me-1"></i>FOUND
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Status Badge -->
+        {% if item.status == 'delivered' %}
+        <div class="position-absolute top-0 end-0 m-2">
+            <span class="badge bg-primary">
+                <i class="bi bi-check-circle me-1"></i>Delivered
+            </span>
+        </div>
+        {% elif item.status == 'matched' %}
+        <div class="position-absolute top-0 end-0 m-2">
+            <span class="badge bg-info">
+                <i class="bi bi-link me-1"></i>Matched
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body p-3">
+        <h6 class="card-title fw-bold mb-1 text-truncate" title="{{ item.title }}">
+            {{ item.title }}
+        </h6>
+        
+        <!-- Category Badge -->
+        <span class="badge bg-secondary bg-opacity-10 text-secondary mb-2 small">
+            <i class="bi bi-tag me-1"></i>{{ item.get_category_display }}
+        </span>
+        
+        <!-- Location -->
+        <p class="text-muted small mb-1">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+            {{ item.location|truncatechars:40 }}
+        </p>
+        
+        <!-- Date -->
+        <p class="text-muted small mb-2">
+            <i class="bi bi-calendar-fill text-primary me-1"></i>
+            {{ item.date_reported|date:"d M Y" }}
+        </p>
+        
+        <!-- Description preview -->
+        <p class="card-text text-muted small mb-3" style="height: 2.5em; overflow: hidden;">
+            {{ item.description|truncatechars:80 }}
+        </p>
+    </div>
+
+    <!-- Card Footer - Posted by and View button -->
+    <div class="card-footer bg-transparent border-top-0 p-3 pt-0">
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                <i class="bi bi-person-fill me-1"></i>
+                {{ item.user.first_name|default:item.user.username }}
+            </small>
+            <a href="{% url 'item_detail' item.pk %}" class="btn btn-sm btn-primary">
+                View Details <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</div>

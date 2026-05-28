@@ -1,0 +1,239 @@
+{% extends 'lostfound/base.html' %}
+{% load static %}
+
+{% block title %}{% if editing %}Edit Item{% else %}Post Item{% endif %} - Lost & Found Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Page Header -->
+            <div class="text-center mb-4">
+                {% if editing %}
+                    <h2 class="fw-bold"><i class="bi bi-pencil-fill text-primary me-2"></i>Edit Item</h2>
+                    <p class="text-muted">Update the details of your posted item</p>
+                {% else %}
+                    <h2 class="fw-bold"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Post an Item</h2>
+                    <p class="text-muted">Report a lost or found item to help reunite it with its owner</p>
+                {% endif %}
+            </div>
+
+            <!-- Quick Type Selector (only for new posts) -->
+            {% if not editing %}
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="type-selector card border-2 border-danger rounded-3 p-4 text-center cursor-pointer"
+                         onclick="selectType('lost')" id="lostSelector">
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-2 mb-2"></i>
+                        <h5 class="fw-bold text-danger mb-1">I Lost Something</h5>
+                        <p class="text-muted small mb-0">Report an item you've lost</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="type-selector card border-2 border-success rounded-3 p-4 text-center cursor-pointer"
+                         onclick="selectType('found')" id="foundSelector">
+                        <i class="bi bi-hand-thumbs-up-fill text-success fs-2 mb-2"></i>
+                        <h5 class="fw-bold text-success mb-1">I Found Something</h5>
+                        <p class="text-muted small mb-0">Report an item you've found</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Main Form Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white p-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-form me-2"></i>
+                        {% if editing %}Update Item Details{% else %}Item Details{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" id="itemForm">
+                        {% csrf_token %}
+
+                        <!-- Item Type (hidden, controlled by selector above) -->
+                        <div class="mb-3 {% if not editing %}d-none{% endif %}" id="itemTypeField">
+                            <label class="form-label fw-bold">Item Type *</label>
+                            {{ form.item_type }}
+                        </div>
+
+                        <!-- Item Title -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-tag-fill text-primary me-1"></i>Item Name / Title *
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Be specific: "iPhone 13 Pro Max Blue" not just "Phone"</div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-grid-fill text-primary me-1"></i>Category *
+                            </label>
+                            {{ form.category }}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-card-text text-primary me-1"></i>Description *
+                            </label>
+                            {{ form.description }}
+                            <div class="form-text">
+                                Include: color, brand, model, size, unique marks, serial number, IMEI (for phones), etc.
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <!-- Location -->
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>Location *
+                                </label>
+                                {{ form.location }}
+                                <div class="form-text">Where was it lost/found?</div>
+                            </div>
+
+                            <!-- Date -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-calendar-fill text-primary me-1"></i>Date *
+                                </label>
+                                {{ form.date_reported }}
+                            </div>
+                        </div>
+
+                        <!-- Additional Location Details -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Location Details <span class="text-muted fw-normal">(Optional)</span></label>
+                            {{ form.location_detail }}
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-image-fill text-primary me-1"></i>Upload Image <span class="text-muted fw-normal">(Optional but recommended)</span>
+                            </label>
+                            {{ form.image }}
+                            <div class="form-text">Upload a clear photo of the item. Max size: 5MB</div>
+
+                            <!-- Image Preview -->
+                            {% if editing and item.image %}
+                            <div class="mt-2">
+                                <p class="text-muted small mb-1">Current image:</p>
+                                <img src="{{ item.image.url }}" class="img-thumbnail" style="height:150px;" alt="Current image">
+                            </div>
+                            {% endif %}
+
+                            <div id="imagePreview" class="mt-2 d-none">
+                                <p class="text-muted small mb-1">Preview:</p>
+                                <img id="previewImg" src="" class="img-thumbnail" style="height:150px;" alt="Preview">
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="card bg-light border-0 p-3 mb-3">
+                            <h6 class="fw-bold mb-3">
+                                <i class="bi bi-telephone-fill text-primary me-1"></i>
+                                Contact Information <span class="text-muted fw-normal">(Optional)</span>
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Phone Number</label>
+                                    {{ form.contact_phone }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Email</label>
+                                    {{ form.contact_email }}
+                                </div>
+                            </div>
+                            <div class="form-text mt-2">
+                                <i class="bi bi-info-circle me-1"></i>
+                                This is optional. Users can also contact you through the chat system.
+                            </div>
+                        </div>
+
+                        <!-- Form Errors (non-field) -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-circle me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold">
+                                <i class="bi bi-check-circle me-2"></i>
+                                {% if editing %}Update Item{% else %}Post Item{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips Card -->
+            <div class="card border-0 bg-info bg-opacity-10 border-info mt-4">
+                <div class="card-body p-3">
+                    <h6 class="fw-bold text-info"><i class="bi bi-lightbulb-fill me-2"></i>Tips for Better Results</h6>
+                    <ul class="text-muted small mb-0">
+                        <li>Add a clear photo - items with photos get 3x more responses</li>
+                        <li>Be very specific in description (include serial numbers, IMEI, unique marks)</li>
+                        <li>Mention the exact area or landmark for location</li>
+                        <li>Provide contact info for faster communication</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Image preview before upload
+document.getElementById('id_image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            document.getElementById('previewImg').src = evt.target.result;
+            document.getElementById('imagePreview').classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Select item type (Lost/Found)
+function selectType(type) {
+    const lostSelector = document.getElementById('lostSelector');
+    const foundSelector = document.getElementById('foundSelector');
+    const itemTypeSelect = document.getElementById('id_item_type');
+
+    if (type === 'lost') {
+        lostSelector.classList.add('bg-danger', 'bg-opacity-10');
+        foundSelector.classList.remove('bg-success', 'bg-opacity-10');
+    } else {
+        foundSelector.classList.add('bg-success', 'bg-opacity-10');
+        lostSelector.classList.remove('bg-danger', 'bg-opacity-10');
+    }
+    itemTypeSelect.value = type;
+}
+
+// Auto-select based on URL param
+const urlParams = new URLSearchParams(window.location.search);
+const typeParam = urlParams.get('type');
+if (typeParam) {
+    selectType(typeParam);
+}
+</script>
+{% endblock %}

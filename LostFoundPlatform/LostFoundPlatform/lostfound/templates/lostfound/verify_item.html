@@ -1,0 +1,65 @@
+{% extends 'lostfound/base.html' %}
+{% block title %}Verify & Deliver - {{ item.title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white p-4">
+                    <h4 class="fw-bold mb-0"><i class="bi bi-shield-check-fill me-2"></i>Verify & Mark as Delivered</h4>
+                    <p class="mb-0 mt-1 opacity-75">Confirm ownership before handing over the item</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Item Summary -->
+                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 mb-4">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" class="rounded-3" style="width:70px;height:70px;object-fit:cover;" alt="{{ item.title }}">
+                        {% else %}
+                        <div class="bg-secondary rounded-3 d-flex align-items-center justify-content-center" style="width:70px;height:70px;">
+                            <i class="bi bi-box-seam text-white fs-3"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="fw-bold mb-1">{{ item.title }}</h5>
+                            <span class="badge {% if item.item_type == 'lost' %}bg-danger{% else %}bg-success{% endif %}">{{ item.item_type|upper }}</span>
+                            <span class="badge bg-secondary ms-1">{{ item.get_category_display }}</span>
+                            <p class="text-muted small mb-0 mt-1"><i class="bi bi-geo-alt me-1"></i>{{ item.location }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Verification Instructions -->
+                    <div class="alert alert-info">
+                        <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>How Verification Works</h6>
+                        <ul class="mb-0 small">
+                            <li>Ask the claimant to provide proof of ownership</li>
+                            <li>For phones: IMEI number, lock screen password</li>
+                            <li>For documents: Document number, name on document</li>
+                            <li>For vehicles: Registration number, key description</li>
+                            <li>Enter the verification details below and confirm delivery</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Proof of Ownership / Verification Details *</label>
+                            {{ form.verification_detail }}
+                            <div class="form-text">Enter the proof provided by the claimant (IMEI, ID number, etc.)</div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Additional Notes (Optional)</label>
+                            {{ form.notes }}
+                        </div>
+                        <div class="d-flex gap-3">
+                            <a href="{% url 'item_detail' item.pk %}" class="btn btn-outline-secondary flex-fill">Cancel</a>
+                            <button type="submit" class="btn btn-success flex-fill fw-bold">
+                                <i class="bi bi-check-circle me-2"></i>Confirm & Mark Delivered
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'lostfound/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Lost & Found Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-grid-fill text-primary me-2"></i>Item Dashboard</h2>
+            <p class="text-muted mb-0">Browse all lost and found items</p>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="d-flex gap-2">
+            <a href="{% url 'post_item' %}?type=lost" class="btn btn-danger">
+                <i class="bi bi-plus-circle me-1"></i>Report Lost
+            </a>
+            <a href="{% url 'post_item' %}?type=found" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i>Report Found
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-3 fw-bold text-danger">{{ lost_count }}</div>
+                <div class="small text-muted"><i class="bi bi-exclamation-triangle me-1"></i>Lost Items</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-3 fw-bold text-success">{{ found_count }}</div>
+                <div class="small text-muted"><i class="bi bi-hand-thumbs-up me-1"></i>Found Items</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-3 fw-bold text-warning">{{ pending_count }}</div>
+                <div class="small text-muted"><i class="bi bi-clock me-1"></i>Pending</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-3 fw-bold text-primary">{{ delivered_count }}</div>
+                <div class="small text-muted"><i class="bi bi-check-circle me-1"></i>Delivered</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Filter Card -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="bi bi-funnel-fill me-2"></i>Search & Filter Items</h6>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{% url 'dashboard' %}">
+                <div class="row g-3">
+                    <!-- Keyword Search -->
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Keyword</label>
+                        {{ form.keyword }}
+                    </div>
+                    <!-- Category Filter -->
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Category</label>
+                        {{ form.category }}
+                    </div>
+                    <!-- Type Filter -->
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Type</label>
+                        {{ form.item_type }}
+                    </div>
+                    <!-- Location Filter -->
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Location</label>
+                        {{ form.location }}
+                    </div>
+                    <!-- Date Range -->
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">From Date</label>
+                        {{ form.date_from }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">To Date</label>
+                        {{ form.date_to }}
+                    </div>
+                    <!-- Buttons -->
+                    <div class="col-md-6 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab Navigation for filtering by type -->
+    <ul class="nav nav-pills mb-3" id="itemTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="pill" href="#all-items">
+                All Items ({{ items|length }})
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger" data-bs-toggle="pill" href="#lost-items">
+                <i class="bi bi-exclamation-triangle me-1"></i>Lost ({{ lost_count }})
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-success" data-bs-toggle="pill" href="#found-items">
+                <i class="bi bi-hand-thumbs-up me-1"></i>Found ({{ found_count }})
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-primary" data-bs-toggle="pill" href="#delivered-items">
+                <i class="bi bi-check-circle me-1"></i>Delivered ({{ delivered_count }})
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- All Items Tab -->
+        <div class="tab-pane fade show active" id="all-items">
+            {% if items %}
+            <div class="row g-4">
+                {% for item in items %}
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    {% include 'lostfound/item_card.html' with item=item %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <h5 class="text-muted mt-3">No items found</h5>
+                <p class="text-muted">Try adjusting your search filters.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Lost Items Tab -->
+        <div class="tab-pane fade" id="lost-items">
+            <div class="row g-4">
+                {% for item in items %}
+                {% if item.item_type == 'lost' %}
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    {% include 'lostfound/item_card.html' with item=item %}
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">No lost items found.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Found Items Tab -->
+        <div class="tab-pane fade" id="found-items">
+            <div class="row g-4">
+                {% for item in items %}
+                {% if item.item_type == 'found' %}
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    {% include 'lostfound/item_card.html' with item=item %}
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">No found items listed.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Delivered Items Tab -->
+        <div class="tab-pane fade" id="delivered-items">
+            <div class="row g-4">
+                {% for item in items %}
+                {% if item.status == 'delivered' %}
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    {% include 'lostfound/item_card.html' with item=item %}
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">No delivered items yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

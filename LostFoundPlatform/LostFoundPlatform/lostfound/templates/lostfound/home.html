@@ -1,0 +1,180 @@
+{% extends 'lostfound/base.html' %}
+{% load static %}
+
+{% block title %}Home - Lost & Found Smart Platform{% endblock %}
+
+{% block content %}
+
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<section class="hero-section bg-gradient-primary text-white py-5">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">
+                    Lost Something? <br>
+                    <span class="text-warning">Found Something?</span>
+                </h1>
+                <p class="lead mb-4">
+                    Lost & Found Smart Platform connects people who lost items with those who found them. 
+                    Post your item, get matched, and reunite with your belongings!
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'post_item' %}?type=lost" class="btn btn-danger btn-lg px-4 fw-bold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Report Lost Item
+                    </a>
+                    <a href="{% url 'post_item' %}?type=found" class="btn btn-success btn-lg px-4 fw-bold">
+                        <i class="bi bi-hand-thumbs-up-fill me-2"></i>Report Found Item
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                <!-- Statistics Cards -->
+                <div class="row g-3">
+                    <div class="col-4">
+                        <div class="stat-card bg-white text-dark rounded-3 p-3 shadow">
+                            <div class="fs-2 fw-bold text-danger">{{ total_lost }}</div>
+                            <div class="small text-muted">Lost Items</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card bg-white text-dark rounded-3 p-3 shadow">
+                            <div class="fs-2 fw-bold text-success">{{ total_found }}</div>
+                            <div class="small text-muted">Found Items</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card bg-white text-dark rounded-3 p-3 shadow">
+                            <div class="fs-2 fw-bold text-primary">{{ total_delivered }}</div>
+                            <div class="small text-muted">Delivered</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     HOW IT WORKS SECTION
+     ============================================================ -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">How It Works</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="step-card p-4">
+                    <div class="step-icon bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:70px;height:70px">
+                        <i class="bi bi-pencil-fill fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold">1. Post Your Item</h5>
+                    <p class="text-muted small">Fill in details about your lost or found item with photos and location.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card p-4">
+                    <div class="step-icon bg-warning text-dark rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:70px;height:70px">
+                        <i class="bi bi-lightning-fill fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold">2. Smart Matching</h5>
+                    <p class="text-muted small">Our system automatically finds potential matches between lost and found items.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card p-4">
+                    <div class="step-icon bg-info text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:70px;height:70px">
+                        <i class="bi bi-chat-dots-fill fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold">3. Chat & Verify</h5>
+                    <p class="text-muted small">Chat with the finder, verify ownership through IMEI/ID proof.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card p-4">
+                    <div class="step-icon bg-success text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:70px;height:70px">
+                        <i class="bi bi-gift-fill fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold">4. Reunited!</h5>
+                    <p class="text-muted small">Meet safely, verify the item, and get it back. Mark as delivered!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     RECENT LOST ITEMS
+     ============================================================ -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold"><span class="badge bg-danger me-2">LOST</span> Recent Lost Items</h2>
+            <a href="{% url 'dashboard' %}?item_type=lost" class="btn btn-outline-danger">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        {% if recent_lost %}
+        <div class="row g-4">
+            {% for item in recent_lost %}
+            <div class="col-sm-6 col-lg-4">
+                {% include 'lostfound/item_card.html' with item=item %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-inbox fs-1 text-muted"></i>
+            <p class="text-muted mt-2">No lost items reported yet.</p>
+            <a href="{% url 'post_item' %}?type=lost" class="btn btn-danger">Report a Lost Item</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ============================================================
+     RECENT FOUND ITEMS
+     ============================================================ -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold"><span class="badge bg-success me-2">FOUND</span> Recent Found Items</h2>
+            <a href="{% url 'dashboard' %}?item_type=found" class="btn btn-outline-success">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        {% if recent_found %}
+        <div class="row g-4">
+            {% for item in recent_found %}
+            <div class="col-sm-6 col-lg-4">
+                {% include 'lostfound/item_card.html' with item=item %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-inbox fs-1 text-muted"></i>
+            <p class="text-muted mt-2">No found items reported yet.</p>
+            <a href="{% url 'post_item' %}?type=found" class="btn btn-success">Report a Found Item</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ============================================================
+     CALL TO ACTION SECTION
+     ============================================================ -->
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Ready to Find Your Lost Item?</h2>
+        <p class="lead mb-4">Join thousands of users who have already reunited with their belongings!</p>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-warning btn-lg fw-bold me-3">
+            <i class="bi bi-person-plus me-2"></i>Register Free
+        </a>
+        {% endif %}
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-lg">
+            <i class="bi bi-search me-2"></i>Browse Items
+        </a>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'lostfound/base.html' %}
+{% block title %}My Profile - Lost & Found{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white p-4">
+                    <h4 class="fw-bold mb-0"><i class="bi bi-person-circle me-2"></i>My Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Current Profile Info -->
+                    <div class="d-flex align-items-center gap-4 mb-4 p-3 bg-light rounded-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                             style="width:80px;height:80px;font-size:2rem;flex-shrink:0;">
+                            {{ user.first_name|first|default:user.username|first|upper }}
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h5>
+                            <p class="text-muted mb-1"><i class="bi bi-envelope me-1"></i>{{ user.email }}</p>
+                            <p class="text-muted mb-0"><i class="bi bi-calendar me-1"></i>Joined {{ user.date_joined|date:"F Y" }}</p>
+                        </div>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Bio</label>
+                            {{ form.bio }}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Profile Photo</label>
+                            {{ form.profile_photo }}
+                            {% if user_profile.profile_photo %}
+                            <div class="mt-2">
+                                <img src="{{ user_profile.profile_photo.url }}" class="img-thumbnail rounded-circle"
+                                     style="width:80px;height:80px;object-fit:cover;" alt="Profile">
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex gap-3">
+                            <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary">Back</a>
+                            <button type="submit" class="btn btn-primary fw-bold">
+                                <i class="bi bi-check-circle me-1"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
